@@ -7,6 +7,14 @@ const db = require("./config/db");
 
 const app = express();
 
+// MIDDLEWARE CEK LOGIN ADMIN
+function isAdmin(req, res, next) {
+    if (!req.session.adminId) {
+        return res.status(401).send("Harus login dulu bro");
+    }
+    next();
+}
+
 app.use(cors({
     origin: "http://localhost:3000",
     credentials: true
@@ -26,20 +34,51 @@ app.get("/", (req, res) => {
     res.send("Backend jalan bro");
 });
 
-// REGISTER ADMIN PERTAMA
-app.post("/register", async (req, res) => {
+// LOGIN ADMIN
+app.post("/login", (req, res) => {
     const { username, password } = req.body;
 
-    const hash = await bcrypt.hash(password, 10);
-
     db.query(
-        "INSERT INTO admins (username, password) VALUES (?,?)",
-        [username, hash],
-        (err) => {
-            if (err) return res.json(err);
-            res.json({ message: "Admin dibuat" });
+        "SELECT * FROM admins WHERE username=?",
+        [username],
+        async (err, rows) => {
+            if (err) return res.status(500).json(err);
+
+            if (rows.length === 0) {
+                return res.json({ message: "User tidak ditemukan" });
+            }
+
+            const admin = rows[0];
+
+            const match = await bcrypt.compare(password, admin.password);
+
+            if (!match) {
+                return res.json({ message: "Password salah" });
+            }
+
+            // SIMPAN SESSION LOGIN
+            req.session.adminId = admin.id;
+
+            res.json({ message: "Login berhasil" });
         }
     );
+});
+
+// LOGOUT ADMIN
+app.post("/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) return res.send("Gagal logout");
+        res.send("Logout berhasil");
+    });
+});
+
+// CEK APAKAH SUDAH LOGIN
+app.get("/me", (req, res) => {
+    if (!req.session.adminId) {
+        return res.send("Belum login");
+    }
+
+    res.send("Sudah login sebagai admin ID: " + req.session.adminId);
 });
 
 app.listen(5000, () => {
