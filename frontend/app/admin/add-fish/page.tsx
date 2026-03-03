@@ -135,8 +135,19 @@ export default function AddFishPage() {
                                 </select>
                             </div>
 
+                            <div>
+                                <label className="block mb-2 font-semibold text-gray-800">
+                                    Harga
+                                </label>
+                                <input
+                                    type="number"
+                                    name="price"
+                                    required
+                                    className="w-full border border-blue-400 text-gray-900 p-3 rounded-lg
+                                            focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
                         </div>
-
                     </div>
 
                     {/* STOCK FULL */}

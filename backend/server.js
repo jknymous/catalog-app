@@ -100,12 +100,12 @@ app.use("/uploads", express.static("uploads"));
 
 // Tambah Ikan
 app.post("/add-fish", upload.single("photo"), (req, res) => {
-    const { name, size, stock } = req.body;
+    const { name, size, stock, price } = req.body;
     const photo = req.file ? req.file.filename : null;
 
     db.query(
-        "INSERT INTO fishes (name, size, stock, photo) VALUES (?,?,?,?)",
-        [name, size, stock, photo],
+        "INSERT INTO fishes (name, size, stock, price, photo) VALUES (?,?,?,?,?)",
+        [name, size, stock, price, photo],
         (err) => {
             if (err) return res.status(500).json(err);
             res.json({ message: "Fish berhasil ditambahkan" });
