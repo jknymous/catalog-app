@@ -1,3 +1,5 @@
+const multer = require("multer");
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
@@ -79,6 +81,36 @@ app.get("/me", (req, res) => {
     }
 
     res.send("Sudah login sebagai admin ID: " + req.session.adminId);
+});
+
+// SETUP UPLOAD
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage });
+
+// Biar folder uploads bisa diakses
+app.use("/uploads", express.static("uploads"));
+
+// Tambah Ikan
+app.post("/add-fish", upload.single("photo"), (req, res) => {
+    const { name, size, stock } = req.body;
+    const photo = req.file ? req.file.filename : null;
+
+    db.query(
+        "INSERT INTO fishes (name, size, stock, photo) VALUES (?,?,?,?)",
+        [name, size, stock, photo],
+        (err) => {
+            if (err) return res.status(500).json(err);
+            res.json({ message: "Fish berhasil ditambahkan" });
+        }
+    );
 });
 
 app.listen(5000, () => {

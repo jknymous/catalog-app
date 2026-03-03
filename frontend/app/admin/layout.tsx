@@ -77,10 +77,6 @@ export default function AdminLayout({
                         Add Fish
                     </Link>
 
-                    <Link href="/admin/add-stok" className={menuClass("/admin/add-stok")}>
-                        Add Stok
-                    </Link>
-
                     <Link href="/admin/stok" className={menuClass("/admin/stok")}>
                         Stok
                     </Link>
