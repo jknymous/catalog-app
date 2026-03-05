@@ -113,6 +113,14 @@ app.post("/add-fish", upload.single("photo"), (req, res) => {
     );
 });
 
+// Nampilin Stok
+app.get("/fishes", (req, res) => {
+    db.query("SELECT * FROM fishes ORDER BY id DESC", (err, result) => {
+        if (err) return res.status(500).json(err)
+        res.json(result)
+    })
+})
+
 app.listen(5000, () => {
     console.log("Server jalan di port 5000");
 });
