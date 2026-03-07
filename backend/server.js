@@ -121,6 +121,25 @@ app.get("/fishes", (req, res) => {
     })
 })
 
+// Update Stok
+app.post("/update-stock", (req, res) => {
+    const { id, amount, type } = req.body;
+
+    let query = "";
+
+    if (type === "add") {
+        query = "UPDATE fishes SET stock = stock + ? WHERE id = ?";
+    } else if (type === "minus") {
+        query = "UPDATE fishes SET stock = stock - ? WHERE id = ?";
+    }
+
+    db.query(query, [amount, id], (err) => {
+        if (err) return res.status(500).json(err);
+
+        res.json({ message: "Stock berhasil diupdate" });
+    });
+});
+
 app.listen(5000, () => {
     console.log("Server jalan di port 5000");
 });
