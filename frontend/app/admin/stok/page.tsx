@@ -26,7 +26,13 @@ export default function StokPage() {
     function loadFish() {
         fetch("http://localhost:5000/fishes")
             .then(res => res.json())
-            .then(data => setFishes(data))
+            .then(data => {
+                // SORT A-Z berdasarkan nama
+                const sorted = data.sort((a: Fish, b: Fish) =>
+                    a.name.localeCompare(b.name)
+                )
+                setFishes(sorted)
+            })
     }
 
     function openModal(fish: Fish, action: "add" | "minus") {
@@ -55,14 +61,14 @@ export default function StokPage() {
     }
 
     return (
-        <div className="p-8">
+        <div className="p-2">
 
-            <h1 className="text-3xl font-bold text-center mb-10">
+            <h1 className="text-3xl font-bold text-black text-center mb-10">
                 Stok Ikan
             </h1>
 
             {/* GRID CARD */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
 
                 {fishes.map((fish) => (
 
@@ -94,20 +100,24 @@ export default function StokPage() {
                         </div>
 
                         {/* INFO */}
-                        <div className="p-4 flex justify-between items-start">
+                        <div className="p-2 text-center">
 
-                            <div>
-                                <h2 className="font-semibold text-slate-800 text-lg">
-                                    {fish.name}
-                                </h2>
+                            {/* NAMA TENGAH */}
+                            <h2 className="font-semibold text-slate-800 text-md mb-2">
+                                {fish.name}
+                            </h2>
 
-                                <p className="text-slate-500 text-sm">
+                            {/* STOK + HARGA */}
+                            <div className="flex justify-center gap-4 text-sm">
+
+                                <p className="text-slate-500">
                                     Stok: {fish.stock}
                                 </p>
-                            </div>
 
-                            <div className="text-blue-600 font-bold">
-                                Rp {fish.price?.toLocaleString()}
+                                <p className="text-blue-600 font-semibold">
+                                    Rp {fish.price?.toLocaleString()}
+                                </p>
+
                             </div>
 
                         </div>
