@@ -25,10 +25,10 @@ export default function AddFishPage() {
                 e.target.reset();
                 setPreview(null);
             } else {
-                setNotif({ type: "error", message: "Gagal menambahkan fish" });
+                setNotif({ type: "error", message: data.message });
             }
         } catch {
-            setNotif({ type: "error", message: "Server error bro" });
+            setNotif({ type: "error", message: "Server Error" });
         }
 
         setTimeout(() => setNotif(null), 3000);

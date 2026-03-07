@@ -103,12 +103,35 @@ app.post("/add-fish", upload.single("photo"), (req, res) => {
     const { name, size, stock, price } = req.body;
     const photo = req.file ? req.file.filename : null;
 
+    // cek apakah name + size sudah ada
     db.query(
-        "INSERT INTO fishes (name, size, stock, price, photo) VALUES (?,?,?,?,?)",
-        [name, size, stock, price, photo],
-        (err) => {
+        "SELECT * FROM fishes WHERE name = ? AND size = ?",
+        [name, size],
+        (err, result) => {
+
             if (err) return res.status(500).json(err);
-            res.json({ message: "Fish berhasil ditambahkan" });
+
+            if (result.length > 0) {
+                return res.status(400).json({
+                    message: "Fish dengan nama dan size ini sudah ada bro"
+                });
+            }
+
+            // jika belum ada baru insert
+            db.query(
+                "INSERT INTO fishes (name, size, stock, price, photo) VALUES (?,?,?,?,?)",
+                [name, size, stock, price, photo],
+                (err) => {
+
+                    if (err) return res.status(500).json(err);
+
+                    res.json({
+                        message: "Fish berhasil ditambahkan"
+                    });
+
+                }
+            );
+
         }
     );
 });
