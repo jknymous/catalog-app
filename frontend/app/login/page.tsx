@@ -46,7 +46,7 @@ export default function LoginPage() {
                 <input
                     name="username"
                     placeholder="Username"
-                    className="w-full p-3 mb-4 border border-blue-400 rounded-lg
+                    className="w-full p-3 mb-4 border border-blue-400 rounded-lg text-black
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             placeholder:text-gray-400"
                 />
@@ -57,7 +57,7 @@ export default function LoginPage() {
                         name="password"
                         type={show ? "text" : "password"}
                         placeholder="Password"
-                        className="w-full p-3 border border-blue-400 rounded-lg
+                        className="w-full p-3 border border-blue-400 rounded-lg text-black
                                 focus:outline-none focus:ring-2 focus:ring-blue-500
                                 placeholder:text-gray-400"
                     />
