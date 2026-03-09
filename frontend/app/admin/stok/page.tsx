@@ -20,6 +20,14 @@ export default function StokPage() {
     const [amount, setAmount] = useState(0)
     const [search, setSearch] = useState("")
 
+    const [editModal, setEditModal] = useState(false)
+    const [deleteModal, setDeleteModal] = useState(false)
+    const [notif, setNotif] = useState<string | null>(null)
+
+    const [editName, setEditName] = useState("")
+    const [editPrice, setEditPrice] = useState(0)
+    const [editSize, setEditSize] = useState("")
+
     useEffect(() => {
         loadFish()
     }, [])
@@ -42,6 +50,19 @@ export default function StokPage() {
         setModal(true)
     }
 
+    function openEdit(fish: Fish) {
+        setSelectedFish(fish)
+        setEditName(fish.name)
+        setEditPrice(fish.price)
+        setEditSize(fish.size)
+        setEditModal(true)
+    }
+
+    function openDelete(fish: Fish) {
+        setSelectedFish(fish)
+        setDeleteModal(true)
+    }
+
     async function submitStock() {
 
         await fetch("http://localhost:5000/update-stock", {
@@ -61,8 +82,65 @@ export default function StokPage() {
         loadFish()
     }
 
+    async function submitEdit() {
+
+        const res = await fetch("http://localhost:5000/edit-fish", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: selectedFish?.id,
+                name: editName,
+                price: editPrice,
+                size: editSize
+            })
+        })
+
+        const data = await res.json()
+
+        setNotif(data.message)
+
+        setEditModal(false)
+        loadFish()
+
+        setTimeout(() => setNotif(null), 3000)
+    }
+
+    async function submitDelete() {
+
+        const res = await fetch("http://localhost:5000/delete-fish", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: selectedFish?.id
+            })
+        })
+
+        const data = await res.json()
+
+        setNotif(data.message)
+
+        setDeleteModal(false)
+        loadFish()
+
+        setTimeout(() => setNotif(null), 3000)
+    }
+
     return (
         <div className="p-2">
+
+            {
+                notif && (
+
+                    <div className="fixed top-5 right-5 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg">
+                        {notif}
+                    </div>
+
+                )
+            }
 
             <div className="flex justify-between items-center mb-8">
 
@@ -174,6 +252,24 @@ export default function StokPage() {
 
                             </div>
 
+                            <div className="flex border-t">
+
+                                <button
+                                    onClick={() => openEdit(fish)}
+                                    className="flex-1 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    onClick={() => openDelete(fish)}
+                                    className="flex-1 py-2 text-sm text-red-600 hover:bg-red-50"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
                         </div>
 
                     ))}
@@ -187,7 +283,7 @@ export default function StokPage() {
 
                     <div className="bg-white p-6 rounded-xl w-80">
 
-                        <h2 className="text-xl font-semibold mb-4 text-center">
+                        <h2 className="text-xl font-semibold mb-4 text-center text-black">
                             {type === "add" ? "Tambah Stok" : "Kurangi Stok"}
                         </h2>
 
@@ -196,14 +292,14 @@ export default function StokPage() {
                             placeholder="Jumlah"
                             value={amount}
                             onChange={(e) => setAmount(Number(e.target.value))}
-                            className="w-full border p-3 rounded-lg mb-4"
+                            className="w-full border p-3 rounded-lg mb-4 text-black"
                         />
 
                         <div className="flex gap-3">
 
                             <button
                                 onClick={() => setModal(false)}
-                                className="flex-1 bg-gray-200 p-2 rounded-lg"
+                                className="flex-1 bg-gray-400 p-2 rounded-lg"
                             >
                                 Cancel
                             </button>
@@ -213,6 +309,96 @@ export default function StokPage() {
                                 className="flex-1 bg-blue-600 text-white p-2 rounded-lg"
                             >
                                 Submit
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
+            {editModal && (
+
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+
+                    <div className="bg-white p-6 rounded-xl w-80">
+
+                        <h2 className="text-xl font-semibold mb-4 text-center text-black">
+                            Edit Ikan
+                        </h2>
+
+                        <input
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="w-full border p-3 rounded-lg mb-3 text-black"
+                        />
+
+                        <select
+                            value={editSize}
+                            onChange={(e) => setEditSize(e.target.value)}
+                            className="w-full border p-3 rounded-lg mb-3 text-black"
+                        >
+                            <option>Normal</option>
+                            <option>Big</option>
+                            <option>Maxton</option>
+                        </select>
+
+                        <input
+                            type="number"
+                            value={editPrice}
+                            onChange={(e) => setEditPrice(Number(e.target.value))}
+                            className="w-full border p-3 rounded-lg mb-4 text-black"
+                        />
+
+                        <div className="flex gap-3">
+
+                            <button
+                                onClick={() => setEditModal(false)}
+                                className="flex-1 bg-gray-400 p-2 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={submitEdit}
+                                className="flex-1 bg-blue-600 text-white p-2 rounded-lg"
+                            >
+                                Save
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            )}
+
+            {deleteModal && (
+
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+
+                    <div className="bg-white p-6 rounded-xl w-80 text-center">
+
+                        <h2 className="text-lg font-semibold mb-4 text-black">
+                            Yakin hapus ikan ini?
+                        </h2>
+
+                        <div className="flex gap-3">
+
+                            <button
+                                onClick={() => setDeleteModal(false)}
+                                className="flex-1 bg-gray-400 p-2 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={submitDelete}
+                                className="flex-1 bg-red-600 text-white p-2 rounded-lg"
+                            >
+                                Delete
                             </button>
 
                         </div>

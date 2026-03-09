@@ -163,6 +163,40 @@ app.post("/update-stock", (req, res) => {
     });
 });
 
+// Edit Stok
+app.post("/edit-fish", (req, res) => {
+
+    const { id, name, price, size } = req.body
+
+    db.query(
+        "UPDATE fishes SET name=?, price=?, size=? WHERE id=?",
+        [name, price, size, id],
+        (err) => {
+
+            if (err) return res.status(500).json(err)
+
+            res.json({ message: "Fish berhasil di edit" })
+        })
+
+})
+
+// Delete Ikan
+app.post("/delete-fish", (req, res) => {
+
+    const { id } = req.body
+
+    db.query(
+        "DELETE FROM fishes WHERE id=?",
+        [id],
+        (err) => {
+
+            if (err) return res.status(500).json(err)
+
+            res.json({ message: "Fish berhasil dihapus" })
+        })
+
+})
+
 app.listen(5000, () => {
     console.log("Server jalan di port 5000");
 });
