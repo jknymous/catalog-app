@@ -28,6 +28,9 @@ export default function StokPage() {
     const [editPrice, setEditPrice] = useState(0)
     const [editSize, setEditSize] = useState("")
 
+    const [generateModal, setGenerateModal] = useState(false)
+    const [generatedText, setGeneratedText] = useState("")
+
     useEffect(() => {
         loadFish()
     }, [])
@@ -61,6 +64,48 @@ export default function StokPage() {
     function openDelete(fish: Fish) {
         setSelectedFish(fish)
         setDeleteModal(true)
+    }
+
+    function generateStock() {
+
+        const sizeOrder: any = {
+            Maxton: 1,
+            Big: 2,
+            Normal: 3
+        }
+
+        const sorted = [...fishes].sort((a, b) => {
+
+            const nameCompare = a.name.localeCompare(b.name)
+
+            if (nameCompare !== 0) return nameCompare
+
+            return sizeOrder[a.size] - sizeOrder[b.size]
+        })
+
+        const result = sorted.map((fish) => {
+
+            let sizeText = ""
+
+            if (fish.size === "Maxton") sizeText = "MAXTON"
+            if (fish.size === "Big") sizeText = "BIG"
+
+            const priceK = fish.price / 1000
+
+            return `${fish.name} ${sizeText} ${priceK}k (${fish.stock})`
+        })
+
+        setGeneratedText(result.join("\n"))
+        setGenerateModal(true)
+    }
+
+    function copyText() {
+
+        navigator.clipboard.writeText(generatedText)
+
+        setNotif("Stok berhasil dicopy")
+
+        setTimeout(() => setNotif(null), 3000)
     }
 
     async function submitStock() {
@@ -148,15 +193,25 @@ export default function StokPage() {
                     Stok Ikan
                 </h1>
 
-                <input
-                    type="text"
-                    placeholder="Cari nama ikan..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-64 px-4 py-2 border-2 border-slate-300 rounded-xl 
-                            focus:outline-none focus:border-blue-500 
-                            text-slate-500"
-                />
+                <div className="flex gap-3">
+
+                    <button
+                        onClick={generateStock}
+                        className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700"
+                    >
+                        Generate
+                    </button>
+
+                    <input
+                        type="text"
+                        placeholder="Cari nama ikan..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-64 px-4 py-2 border-2 border-slate-300 rounded-xl 
+                                focus:outline-none focus:border-blue-500 text-slate-500"
+                    />
+
+                </div>
 
             </div>
 
@@ -405,6 +460,45 @@ export default function StokPage() {
 
                     </div>
 
+                </div>
+
+            )}
+
+            {generateModal && (
+
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+
+                    <div className="bg-white p-6 rounded-xl w-96">
+
+                        <h2 className="text-xl font-semibold mb-4 text-center text-black">
+                            Generate Stok
+                        </h2>
+
+                        <textarea
+                            value={generatedText}
+                            readOnly
+                            className="w-full h-64 border p-3 rounded-lg text-black mb-4"
+                        />
+
+                        <div className="flex gap-3">
+
+                            <button
+                                onClick={() => setGenerateModal(false)}
+                                className="flex-1 bg-gray-400 p-2 rounded-lg"
+                            >
+                                Close
+                            </button>
+
+                            <button
+                                onClick={copyText}
+                                className="flex-1 bg-blue-600 text-white p-2 rounded-lg"
+                            >
+                                Copy
+                            </button>
+
+                        </div>
+
+                    </div>
                 </div>
 
             )}
